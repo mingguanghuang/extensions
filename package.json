@@ -1,0 +1,126 @@
+{
+  "name": "niuniu-extension-plugin",
+  "displayName": "niuniuExtension",
+  "description": "A extension to help developer to create project and manage project",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.105.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "AI助手",
+      "properties": {
+        "aiAssistant.tongyiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "通义千问API密钥"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "welcome-extension-plugin.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "welcome-extension-plugin.showWelcome",
+        "title": "show welcome page"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "treeView",
+          "title": "niuniu developer",
+          "icon": "./src/asset/null-king.svg"
+        }
+      ]
+    },
+    "views": {
+      "treeView": [
+        {
+          "type": "webview",
+          "id": "project.create",
+          "name": "工作区",
+          "icon": "",
+          "when": "!is.open.folder"
+        },
+        {
+          "type": "tree",
+          "id": "fileTreeView",
+          "name": "工作区",
+          "icon": "",
+          "when": "is.open.folder"
+        },
+        {
+          "type": "tree",
+          "id": "treeView-item_tool",
+          "name": "辅助工具",
+          "icon": ""
+        },
+        {
+          "type": "webview",
+          "id": "treeView-item_AI",
+          "name": "AI 助手",
+          "icon": ""
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "treeView",
+        "contents": "welcome to myextension!\n[welcome](command:welcome-extension-plugin.showWelcome)"
+      },
+      {
+        "view": "project.create",
+        "contents": "",
+        "when": "!is.open.folder"
+      },
+      {
+        "view": "fileTreeView",
+        "contents": "",
+        "when": "is.open.folder"
+      },
+      {
+        "view": "treeView-item_AI",
+        "contents": ""
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.105.0",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "copy-webpack-plugin": "^13.0.1",
+    "eslint": "^9.36.0",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "webpack": "^5.102.0",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/ai_assistant.css">
+    <title>AI助手</title>
+</head>
+<body>
+    <div class="ai-assistant-container">
+        <div class="chat-header">
+            <div class="header-left">
+                <h3>AI助手</h3>
+                <div class="model-info">
+                    <span>当前模型: </span>
+                    <span id="currentModelDisplay" class="model-name">Qwen Turbo</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="model-selector">
+                    <select id="modelSelect" class="model-select">
+                        <option value="qwen-turbo">Qwen Turbo (快速)</option>
+                    </select>
+                </div>
+                <button id="configureApiKeyBtn" class="btn-secondary">配置API密钥</button>
+                <button id="clearHistoryBtn" class="btn-secondary">清空历史</button>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div id="chatMessages" class="chat-messages"></div>
+            
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="输入您的问题..." 
+                        rows="3"
+                    ></textarea>
+                    <button id="sendButton" class="send-button">
+                        <span>发送</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/ai_assistant.js"></script>
+</body>
+</html>

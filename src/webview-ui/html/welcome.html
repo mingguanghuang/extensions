@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欢迎使用 Welcome Extension</title>
+    <link rel="stylesheet" href="css/welcome.css">
+</head>
+<body>
+    <div class="welcome-container">
+        <h1>🎉 欢迎使用 Welcome Extension!</h1>
+        
+        <p class="welcome-description">
+            感谢您安装我们的扩展！这是一个专为提升您的开发体验而设计的工具。
+        </p>
+        
+        <h2>✨ 主要功能</h2>
+        <ul class="feature-list">
+            <li><strong>智能欢迎页面</strong> - 在VS Code启动时自动展示友好的欢迎界面</li>
+            <li><strong>快速访问</strong> - 通过命令面板快速打开欢迎页面</li>
+            <li><strong>现代化界面</strong> - 采用现代化的UI设计，提供愉悦的视觉体验</li>
+            <li><strong>易于扩展</strong> - 模块化设计，方便添加新功能</li>
+        </ul>
+        
+        <div class="quick-actions">
+            <button class="btn" onclick="vscodePostMessage('hello')">👋 打个招呼</button>
+            <button class="btn" onclick="vscodePostMessage('close')">❌ 关闭页面</button>
+        </div>
+        
+        <div class="footer">
+            <p>如有任何问题或建议，请通过扩展设置联系我们。</p>
+            <p class="version-info">版本: 1.0.0 | 最后更新: <span id="update-date"></span></p>
+        </div>
+    </div>
+    
+    <script src="js/welcome.js"></script>
+</body>
+</html>
