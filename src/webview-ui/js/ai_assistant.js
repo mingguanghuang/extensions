@@ -7,8 +7,12 @@ class AIAssistantFrontend {
         this.modelSelect = document.getElementById('modelSelect');
         this.currentModelDisplay = document.getElementById('currentModelDisplay');
         this.isLoading = false;
-        this.currentModel = 'qwen-max';
+        this.currentModel = 'ALI_TONGYI_MAX_MODEL';
         this.availableModels = {};
+        
+        // 流式响应相关状态
+        this.streamingResponse = null; // 当前流式响应的消息元素
+        this.streamingContent = '';    // 当前流式响应的累积内容
         
         this.initializeEventListeners();
         this.requestInitialData();
@@ -50,32 +54,16 @@ class AIAssistantFrontend {
                 this.configureApiKey();
             });
         }
-
-        // 清除历史按钮
-        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-        if (clearHistoryBtn) {
-            clearHistoryBtn.addEventListener('click', () => {
-                this.clearHistory();
-            });
-        }
     }
 
     handleVSCodeMessage(message) {
         switch (message.type) {
-            case 'chatHistory':
-                this.displayChatHistory(message.history);
-                break;
-                
             case 'loading':
-                this.showLoadingIndicator(message.messageId);
+                this.showLoadingIndicator(message.isLoading);
                 break;
                 
             case 'error':
                 this.showError(message.message);
-                break;
-                
-            case 'chatUpdate':
-                this.displayChatHistory(message.history);
                 break;
 
             case 'availableModels':
@@ -85,27 +73,89 @@ class AIAssistantFrontend {
             case 'currentModel':
                 this.updateCurrentModel(message.model, message.displayName);
                 break;
+                
+            case 'modelChanged':
+                this.showSuccessMessage(`模型已切换到: ${message.displayName || message.model}`);
+                break;
+                
+            case 'aiResponse':
+                this.displayAIResponse(message);
+                break;
+                
+            case 'streamingResponse':
+                this.handleStreamingResponse(message);
+                break;
         }
     }
 
-    displayChatHistory(history) {
-        this.chatMessages.innerHTML = '';
-        
-        if (history && history.length > 0) {
-            history.forEach(message => {
-                this.addMessageToChat(message);
-            });
-        } else {
-            this.addWelcomeMessage();
+    // 处理流式响应
+    handleStreamingResponse(message) {
+        // 如果是第一个流式响应区块，创建新的消息元素
+        if (!this.streamingResponse) {
+            this.streamingResponse = this.createStreamingMessageElement(message);
+            this.chatMessages.appendChild(this.streamingResponse);
+            this.scrollToBottom();
         }
         
-        this.scrollToBottom();
+        // 累积内容并更新显示
+        this.streamingContent += message.content;
+        this.updateStreamingMessageContent();
     }
 
-    addMessageToChat(message) {
-        const messageElement = this.createMessageElement(message);
-        this.chatMessages.appendChild(messageElement);
-        this.scrollToBottom();
+    createStreamingMessageElement(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message assistant streaming';
+        messageDiv.id = 'streamingMessage';
+        
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'message-header';
+        
+        const roleSpan = document.createElement('span');
+        roleSpan.className = 'message-role';
+        roleSpan.textContent = 'AI助手';
+        
+        const modelSpan = document.createElement('span');
+        modelSpan.className = 'message-model';
+        modelSpan.textContent = message.model ? ` (${this.getModelDisplayName(message.model)})` : '';
+        
+        headerDiv.appendChild(roleSpan);
+        headerDiv.appendChild(modelSpan);
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content streaming-content';
+        contentDiv.textContent = '';
+        
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        timeDiv.textContent = this.formatTime(message.timestamp);
+        
+        messageDiv.appendChild(headerDiv);
+        messageDiv.appendChild(contentDiv);
+        messageDiv.appendChild(timeDiv);
+        
+        return messageDiv;
+    }
+
+    updateStreamingMessageContent() {
+        if (!this.streamingResponse) return;
+        
+        const contentDiv = this.streamingResponse.querySelector('.streaming-content');
+        if (contentDiv) {
+            contentDiv.textContent = this.streamingContent;
+            this.scrollToBottom();
+        }
+    }
+
+    finishStreamingResponse() {
+        if (this.streamingResponse) {
+            // 移除流式响应的特殊标识
+            this.streamingResponse.className = 'message assistant';
+            this.streamingResponse.id = '';
+            
+            // 重置流式响应状态
+            this.streamingResponse = null;
+            this.streamingContent = '';
+        }
     }
 
     createMessageElement(message) {
@@ -128,7 +178,9 @@ class AIAssistantFrontend {
         
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        contentDiv.textContent = message.content;
+        
+        // 直接使用后端传来的HTML内容
+        contentDiv.innerHTML = message.content;
         
         const timeDiv = document.createElement('div');
         timeDiv.className = 'message-time';
@@ -141,31 +193,47 @@ class AIAssistantFrontend {
         return messageDiv;
     }
 
-    createLoadingElement() {
-        const loadingDiv = document.createElement('div');
-        loadingDiv.className = 'message assistant loading';
-        loadingDiv.id = 'loadingMessage';
+    showLoadingIndicator(isLoading) {
+        this.isLoading = isLoading;
+        this.sendButton.disabled = isLoading;
         
-        const loadingText = document.createElement('span');
-        loadingText.textContent = 'AI正在思考';
-        
-        const dotsDiv = document.createElement('div');
-        dotsDiv.className = 'loading-dots';
-        dotsDiv.innerHTML = '<span></span><span></span><span></span>';
-        
-        loadingDiv.appendChild(loadingText);
-        loadingDiv.appendChild(dotsDiv);
-        
-        return loadingDiv;
+        if (isLoading) {
+            // 开始加载时，重置流式响应状态
+            this.finishStreamingResponse();
+            
+            const loadingElement = this.createLoadingElement();
+            this.chatMessages.appendChild(loadingElement);
+            this.scrollToBottom();
+        } else {
+            this.hideLoadingIndicator();
+        }
     }
 
-    showLoadingIndicator(messageId) {
-        this.isLoading = true;
-        this.sendButton.disabled = true;
+    displayAIResponse(message) {
+        this.hideLoadingIndicator();
         
-        const loadingElement = this.createLoadingElement();
-        this.chatMessages.appendChild(loadingElement);
+        const messageElement = this.createMessageElement({
+            role: 'assistant',
+            content: message.content,
+            model: message.model,
+            timestamp: message.timestamp
+        });
+        
+        this.chatMessages.appendChild(messageElement);
         this.scrollToBottom();
+    }
+
+    showLoadingIndicator(isLoading) {
+        this.isLoading = isLoading;
+        this.sendButton.disabled = isLoading;
+        
+        if (isLoading) {
+            const loadingElement = this.createLoadingElement();
+            this.chatMessages.appendChild(loadingElement);
+            this.scrollToBottom();
+        } else {
+            this.hideLoadingIndicator();
+        }
     }
 
     hideLoadingIndicator() {
@@ -186,6 +254,34 @@ class AIAssistantFrontend {
         errorDiv.textContent = errorMessage;
         
         this.chatMessages.appendChild(errorDiv);
+        this.scrollToBottom();
+    }
+
+    showSuccessMessage(successMessage) {
+        const successDiv = document.createElement('div');
+        successDiv.className = 'success-message';
+        successDiv.textContent = successMessage;
+        
+        this.chatMessages.appendChild(successDiv);
+        this.scrollToBottom();
+        
+        // 3秒后自动移除成功消息
+        setTimeout(() => {
+            successDiv.remove();
+        }, 3000);
+    }
+
+    displayAIResponse(message) {
+        this.hideLoadingIndicator();
+        
+        const messageElement = this.createMessageElement({
+            role: 'assistant',
+            content: message.content,
+            model: message.model,
+            timestamp: message.timestamp
+        });
+        
+        this.chatMessages.appendChild(messageElement);
         this.scrollToBottom();
     }
 
@@ -240,11 +336,11 @@ class AIAssistantFrontend {
         }
     }
 
-    clearHistory() {
-        vscode.postMessage({
-            type: 'clearHistory'
-        });
-    }
+    // clearHistory() {
+    //     vscode.postMessage({
+    //         type: 'clearHistory'
+    //     });
+    // }
 
     configureApiKey() {
         vscode.postMessage({
@@ -254,10 +350,7 @@ class AIAssistantFrontend {
 
     requestInitialData() {
         vscode.postMessage({
-            type: 'getHistory'
-        });
-        vscode.postMessage({
-            type: 'getModels'
+            type: 'getAvailableModels'
         });
         vscode.postMessage({
             type: 'getCurrentModel'

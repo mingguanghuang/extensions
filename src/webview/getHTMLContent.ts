@@ -10,8 +10,6 @@ abstract class BaseWebView {
 	protected abstract getHtmlFileName(): string;
 	protected abstract getCssFileName(): string;
 	protected abstract getJsFileName(): string;
-
-	// 消息处理方法,根据需求在子类中实现
 	
 
 	// 通用的内容生成方法

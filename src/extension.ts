@@ -4,7 +4,13 @@ import * as vscode from 'vscode';
 import { FileTreeViewProvider, TreeItem} from './webview/FileTreeView';
 import { showWelcome, Button } from './webview/getHTMLContent';
 import {ButtonWebviewProvider} from './webview/ButtonWebview';
-import {AIAsistantWebViewProvider} from './webview/AI_AssistantWebView';
+import { AI_asistant_WebViewProvider } from './webview/AI_AssistantWebView';
+import { getLang } from './StringLangLabel';
+
+
+export const stringLocal = getLang();
+
+
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -23,9 +29,14 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	
 	const buttonWebview = vscode.window.registerWebviewViewProvider('project.create', new ButtonWebviewProvider(context.extensionUri));
-
+	
 	// 注册AI助手视图
-	const aiAssistantWebview = vscode.window.registerWebviewViewProvider('treeView-item_AI', new AIAsistantWebViewProvider(context.extensionUri));
+	const aiAssistantWebview = vscode.window.registerWebviewViewProvider(
+		AI_asistant_WebViewProvider.viewType, 
+		new AI_asistant_WebViewProvider(context.extensionUri)
+	);
+	
+	
 		
 	// 在VS Code启动完成后自动显示欢迎页面（只在第一次激活时显示）
 	let ShowWelcome = new showWelcome();
@@ -54,7 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 
-	context.subscriptions.push(disposable, showWelcomeCommand,buttonWebview,fileTreeView);
+	context.subscriptions.push(disposable, showWelcomeCommand, buttonWebview, fileTreeView, aiAssistantWebview);
 }
 
 
