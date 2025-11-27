@@ -57,6 +57,14 @@ const extensionConfig = {
           from: 'src/asset',
           to: 'asset',
           noErrorOnMissing: true
+        },{
+          from: 'package.nls.json',
+          to: 'package.nls.json',
+          noErrorOnMissing: true
+        },{
+          from: 'package.nls.zh-CN.json', 
+          to: 'package.nls.zh-CN.json',
+          noErrorOnMissing: true
         }
       ]
     })

@@ -74,17 +74,9 @@ export class TONGYI_AIAssistant extends ModelBase{
     const format_msg = this.convertToLangChainMessages(messages);
     
     // 使用输出解析器处理流式响应
-    const stream = await this.chatModel.pipe(this.outputParser).stream(format_msg);
-    
-    let fullResponse = '';
-    
-    for await (const chunk of stream) {
-      if (chunk) {
-        fullResponse += chunk;
-      }
-    }
-    
-    return fullResponse;
+    const response = await this.chatModel.pipe(this.outputParser).invoke(format_msg);
+        
+    return response;
   }
 
   /**

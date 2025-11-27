@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-
+import * as path from 'path';
+import * as fs from 'fs';
 // 抽象基类，处理通用的文件读取和内容生成逻辑
 abstract class BaseWebView {
 	
@@ -185,3 +186,6 @@ export class AIAssistantProvider extends BaseWebView {
         return 'ai_assistant.js';
     }
 }
+
+
+
