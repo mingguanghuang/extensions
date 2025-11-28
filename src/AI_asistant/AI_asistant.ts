@@ -45,7 +45,7 @@ export class TONGYI_AIAssistant extends ModelBase{
         // 如果存在工具调用定义，将其转换为 AIMessage 支持的格式
         if (msg.tool_calls && msg.tool_calls.length > 0) {
           assistantMsgPayload.tool_calls = msg.tool_calls.map(tc => ({
-            id: tc.id, // 或使用 tc.id，根据您的接口定义
+            id: tc.id, 
             type: tc.type,
             function: {
               name: tc.function.name,
@@ -61,7 +61,7 @@ export class TONGYI_AIAssistant extends ModelBase{
         // 处理工具返回消息
         return new ToolMessage({
           content: msg.content,
-          tool_call_id: msg.tool_call_id, // 确保字段名匹配
+          tool_call_id: msg.tool_call_id, 
         });
 
       default:

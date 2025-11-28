@@ -30,7 +30,7 @@ export class AI_asistant_WebViewProvider implements vscode.WebviewViewProvider {
         };
 
         // 构建webview UI的HTML内容
-        const htmlContent = getHtmlForWebview(webviewView.webview, this._extensionUri, '/dist/webview-ui/CreateProject');
+        const htmlContent = getHtmlForWebview(webviewView.webview, this._extensionUri, '/dist/webview-ui/AIAssistant');
         webviewView.webview.html = htmlContent;
 
         // 初始化AI助手处理进程
@@ -190,14 +190,15 @@ export class TongYi_AI_assistant_Process {
             // 流式处理 - 实时接收响应
             const stream = this._aiAssistant.ChatMethodStream(messages);
             for await (const chunk of stream) {
-                console.log('收到区块:', chunk);
+                // console.log('收到区块:', chunk);
                 this.sendStreamingResponse(chunk);
             }
-
+            this.sendSessionEnd();
 
         } catch (error) {
             console.error('AI响应失败:', error);
             this.sendError('AI响应失败，请稍后重试');
+            this.sendSessionEnd();
         } finally {
             // 隐藏加载指示器
             this.sendLoading(false);
@@ -294,7 +295,14 @@ export class TongYi_AI_assistant_Process {
             timestamp: Date.now()
         });
     }
-
+    private sendSessionEnd() {
+    this._webview.postMessage({
+        type: 'sessionEnd',
+        content: "------会话结束------",
+        model: this._currentModel,
+        timestamp: Date.now(),
+    });
+}
     private sendInitialData() {
         this.sendAvailableModels();
         this.sendCurrentModel();

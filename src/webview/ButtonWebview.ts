@@ -7,14 +7,15 @@ export class ButtonWebviewProvider implements vscode.WebviewViewProvider {
   }
 
   public static readonly viewType = "create.project";
-
+  
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     _context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
   ) {
-
+  
+    
     // 设置webview选项
     webviewView.webview.options = {
       enableScripts: true,
@@ -42,7 +43,7 @@ export class ButtonWebviewProvider implements vscode.WebviewViewProvider {
     const workspaceChangeDisposable = vscode.workspace.onDidChangeWorkspaceFolders(updateContext);
     // 监听webview消息
     const messageDisposable = webviewView.webview.onDidReceiveMessage((message) => {
-      this.handleWebViewMessage(webviewView, message);
+      this.handleWebViewMessage(message);
     });
 
     // 当webview被销毁时清理监听器
@@ -72,20 +73,20 @@ export class ButtonWebviewProvider implements vscode.WebviewViewProvider {
   }
 
   
-  private handleWebViewMessage(command: vscode.WebviewView, message: any): void {
-      switch (message.type) {
+ private handleWebViewMessage( message: any): void {
+    switch (message.command) {  
         case 'openFolder':
-          this.handleOpenFolder();
-          console.log('打开文件夹消息:', message);
-          break;
-  
+            this.handleOpenFolder();
+            console.log('打开文件夹消息:', message);
+            break;
+
         case 'createProject':
-          vscode.commands.executeCommand( "project.type.view");
-          console.log('创建项目消息:', message);
-          break;
+            vscode.commands.executeCommand("project.type.view");
+            console.log('创建项目消息:', message);
+            break;
 
         default:
-          console.log('收到未知消息:', message);
-      }
+            console.log('收到未知消息:', message);
     }
+}
 }
