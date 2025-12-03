@@ -1,9 +1,8 @@
-import * as vscode from 'vscode';
 import { ModelConfig ,ALI_TONGYI_API_KEY, ALI_TONGYI_Prompt_Messages,ModelBase} from './model_config';
 import { ChatOpenAI, ChatOpenAICallOptions } from '@langchain/openai';
 import { BaseMessage,SystemMessage, HumanMessage, AIMessage, ToolMessage } from '@langchain/core/messages';
 import { StringOutputParser } from '@langchain/core/output_parsers';
-
+import { getRetrievalResults } from '../api/api';
 
 export class TONGYI_AIAssistant extends ModelBase{
     public apiKey: string = ALI_TONGYI_API_KEY!;
@@ -27,7 +26,18 @@ export class TONGYI_AIAssistant extends ModelBase{
     streaming: true,
   });
   
-  private convertToLangChainMessages(messages: ALI_TONGYI_Prompt_Messages[]): BaseMessage[] {
+  private convertToLangChainMessages(messages: ALI_TONGYI_Prompt_Messages[], retrievalContent?: string): BaseMessage[] {
+  if (retrievalContent) {
+    const modifiedMessages = [...messages];
+    if (modifiedMessages.length > 0 && modifiedMessages[0].role === 'system') {
+      modifiedMessages[0] = {
+        ...modifiedMessages[0],
+        content: `${modifiedMessages[0].content}\n\n请根据以下内容回答问题:\n${retrievalContent}`
+      };
+    }
+    messages = modifiedMessages;
+  }
+
   return messages.map(msg => {
     switch (msg.role) {
       case 'user':
@@ -84,10 +94,19 @@ export class TONGYI_AIAssistant extends ModelBase{
    * @param messages 消息数组
    * @returns 异步生成器，实时返回响应区块
    */
-  public async *ChatMethodStream(messages: ALI_TONGYI_Prompt_Messages[]): AsyncGenerator<string> {
-    const format_msg = this.convertToLangChainMessages(messages);
+  public async *ChatMethodStreamWithRAG(messages: ALI_TONGYI_Prompt_Messages[]): AsyncGenerator<string> {
+    let retrievalContent = '';
+    try {
+      const results = await getRetrievalResults(messages[1].content);
+      if (Array.isArray(results)) {
+        retrievalContent = results.map(result => result.content).join('\n');
+      }
+    } catch (error) {
+      console.error('获取检索结果失败:', error);  
+    }
     
     // 使用输出解析器处理流式响应
+    const format_msg = this.convertToLangChainMessages(messages, retrievalContent);
     const stream = await this.chatModel.pipe(this.outputParser).stream(format_msg);
     
     // 实时返回每个区块
@@ -97,5 +116,4 @@ export class TONGYI_AIAssistant extends ModelBase{
       }
     }
   }
-// ... existing code ...
 }

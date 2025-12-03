@@ -27,7 +27,7 @@ export class ButtonWebviewProvider implements vscode.WebviewViewProvider {
     
     
     // 构建webview UI的HTML内容
-    const htmlContent = getHtmlForWebview(webviewView.webview, this._extensionUri, '/dist/webview-ui/CreateProject');
+    const htmlContent = getHtmlForWebview(webviewView.webview, this._extensionUri, '/webview-ui/CreateProject');
     webviewView.webview.html = htmlContent;
 
     // 监听工作区文件夹变化，更新上下文

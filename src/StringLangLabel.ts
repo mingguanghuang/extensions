@@ -9,7 +9,7 @@ export function getLang(): any{
     }
     
     // 获取扩展的根目录路径
-    const extensionPath = path.join(__dirname, 'welcome-extension-plugin', '..');
+    const extensionPath = path.join(__dirname, '../');
     const filePath = path.join(extensionPath, fileName);
     
     // 检查文件是否存在

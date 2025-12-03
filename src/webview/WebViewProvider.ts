@@ -8,7 +8,7 @@ export class ProjectTypeWebviewProvider extends WebViewClass implements WebViewI
     public show(): WebViewClass {
         this.createWebView("ProjectCreateType");
         // 设置webview的HTML内容 - 使用CreateProject页面
-        const htmlContent = getHtmlForWebview(this.webView.webview, this._extensionUri, '/dist/webview-ui/ProjectType');
+        const htmlContent = getHtmlForWebview(this.webView.webview, this._extensionUri, '/webview-ui/ProjectType');
         this.webView.webview.html = htmlContent;
         
         // 显示webview
@@ -27,7 +27,7 @@ export class ShowWelcomeWebviewProvider extends WebViewClass implements WebViewI
         this.createWebView("ShowWelcome");
         
         // 设置webview的HTML内容 - 使用ShowWelcome页面
-        const htmlContent = getHtmlForWebview(this.webView.webview, this._extensionUri, '/dist/webview-ui/Welcome');
+        const htmlContent = getHtmlForWebview(this.webView.webview, this._extensionUri, '/webview-ui/Welcome');
         this.webView.webview.html = htmlContent;
         
         // 显示webview

@@ -2,9 +2,6 @@ import * as vscode from 'vscode';
 import { stringLocal } from '../extension';
 import * as path from 'path';
 import * as fs from 'fs';
-/**
- * WebView之后需要重写，所有的WebView类(编辑器展示)从此类继承
- */
 
 /**
  * WebView代理接口

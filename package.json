@@ -12,7 +12,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./dist/extension.js",
+  "main": "./out/extension.js",
   "contributes": {
     "configuration": {
       "title": "niuniu-Extension-AI助手",
@@ -39,7 +39,7 @@
         {
           "id": "treeView",
           "title": "niuniu developer",
-          "icon": "./src/asset/null-king.svg"
+          "icon": "./asset/null-king.svg"
         }
       ]
     },
@@ -124,6 +124,7 @@
     "@langchain/community": "^1.0.4",
     "@langchain/core": "^1.0.6",
     "@langchain/openai": "^1.1.2",
+    "axios": "^1.13.2",
     "dotenv": "^17.2.3",
     "langchain": "^1.0.6",
     "marked": "^12.0.1",

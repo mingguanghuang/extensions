@@ -6,11 +6,11 @@ import { getLang } from './StringLangLabel';
 import { ProjectTypeWebviewProvider, ShowWelcomeWebviewProvider } from './webview/WebViewProvider';
 
 
+
 export const stringLocal = getLang();
 
 
 export function activate(context: vscode.ExtensionContext) {
-
 
 	console.log('Congratulations, your extension "welcome-extension-plugin" is now active!');
 
