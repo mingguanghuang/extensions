@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { getHtmlForWebview } from './webview';
-
+import { ProjectPath } from "../ProjectPath";
 export class ButtonWebviewProvider implements vscode.WebviewViewProvider {
   constructor(private readonly _extensionUri: vscode.Uri) { 
     this._extensionUri = _extensionUri;
@@ -27,7 +27,7 @@ export class ButtonWebviewProvider implements vscode.WebviewViewProvider {
     
     
     // 构建webview UI的HTML内容
-    const htmlContent = getHtmlForWebview(webviewView.webview, this._extensionUri, '/webview-ui/CreateProject');
+    const htmlContent = getHtmlForWebview(webviewView.webview, ProjectPath.CreateProject);
     webviewView.webview.html = htmlContent;
 
     // 监听工作区文件夹变化，更新上下文

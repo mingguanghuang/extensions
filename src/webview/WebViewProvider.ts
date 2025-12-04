@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { WebViewClass, WebViewInterface ,getHtmlForWebview} from "./webview";
+import { ProjectPath } from "../ProjectPath";
 
 export class ProjectTypeWebviewProvider extends WebViewClass implements WebViewInterface {
     constructor(protected readonly _extensionUri: vscode.Uri) { 
@@ -8,7 +9,7 @@ export class ProjectTypeWebviewProvider extends WebViewClass implements WebViewI
     public show(): WebViewClass {
         this.createWebView("ProjectCreateType");
         // 设置webview的HTML内容 - 使用CreateProject页面
-        const htmlContent = getHtmlForWebview(this.webView.webview, this._extensionUri, '/webview-ui/ProjectType');
+        const htmlContent = getHtmlForWebview(this.webView.webview, ProjectPath.ProjectType);
         this.webView.webview.html = htmlContent;
         
         // 显示webview
@@ -27,7 +28,7 @@ export class ShowWelcomeWebviewProvider extends WebViewClass implements WebViewI
         this.createWebView("ShowWelcome");
         
         // 设置webview的HTML内容 - 使用ShowWelcome页面
-        const htmlContent = getHtmlForWebview(this.webView.webview, this._extensionUri, '/webview-ui/Welcome');
+        const htmlContent = getHtmlForWebview(this.webView.webview, ProjectPath.Welcome);
         this.webView.webview.html = htmlContent;
         
         // 显示webview

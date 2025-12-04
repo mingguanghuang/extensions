@@ -83,7 +83,7 @@ export class TONGYI_AIAssistant extends ModelBase{
   public async ChatMethod(messages: ALI_TONGYI_Prompt_Messages[]): Promise<string>{
     const format_msg = this.convertToLangChainMessages(messages);
     
-    // 使用输出解析器处理流式响应
+    // 使用输出解析器处理非流式响应
     const response = await this.chatModel.pipe(this.outputParser).invoke(format_msg);
         
     return response;

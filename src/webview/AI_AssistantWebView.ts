@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { getHtmlForWebview } from './webview';
 import { TongyiModel, ALI_TONGYI_Prompt_Messages, ALI_TONGYI_API_KEY, ALI_TONGYI_API_URL } from '../AI_asistant/model_config';
 import { TONGYI_AIAssistant } from '../AI_asistant/AI_asistant';
-
+import { ProjectPath } from '../ProjectPath';
 export class AI_asistant_WebViewProvider implements vscode.WebviewViewProvider {
     private _webviewView?: vscode.WebviewView;
     private _aiAssistantProcess?: TongYi_AI_assistant_Process;
@@ -30,7 +30,7 @@ export class AI_asistant_WebViewProvider implements vscode.WebviewViewProvider {
         };
 
         // 构建webview UI的HTML内容
-        const htmlContent = getHtmlForWebview(webviewView.webview, this._extensionUri, '/webview-ui/AIAssistant');
+        const htmlContent = getHtmlForWebview(webviewView.webview, ProjectPath.AIAssistant);
         webviewView.webview.html = htmlContent;
 
         // 初始化AI助手处理进程

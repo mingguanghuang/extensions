@@ -21,6 +21,31 @@
           "type": "string",
           "default": "",
           "description": "通义千问API密钥"
+        },
+        "MysqlConnection.host": {
+          "type": "string",
+          "default": "127.0.0.1",
+          "description": "MySql主机"
+        },
+        "MysqlConnection.port": {
+          "type": "number",
+          "default": 3306,
+          "description": "MySql端口"
+        },
+        "MysqlConnection.user": {
+          "type": "string",
+          "default": "root",
+          "description": "MySql用户名"
+        },
+        "MysqlConnection.password": {
+          "type": "string",
+          "default": "",
+          "description": "MySql密码"
+        },
+        "MysqlConnection.database": {
+          "type": "string",
+          "default": "",
+          "description": "MySql数据库"
         }
       }
     },
@@ -124,11 +149,13 @@
     "@langchain/community": "^1.0.4",
     "@langchain/core": "^1.0.6",
     "@langchain/openai": "^1.1.2",
+    "@langchain/redis": "^1.0.1",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
     "langchain": "^1.0.6",
     "marked": "^12.0.1",
     "node-fetch": "^3.3.2",
-    "openai": "^6.9.1"
+    "openai": "^6.9.1",
+    "redis": "^5.10.0"
   }
 }

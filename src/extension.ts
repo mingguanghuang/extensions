@@ -4,14 +4,18 @@ import {ButtonWebviewProvider} from './webview/ButtonWebview';
 import { AI_asistant_WebViewProvider } from './webview/AI_AssistantWebView';
 import { getLang } from './StringLangLabel';
 import { ProjectTypeWebviewProvider, ShowWelcomeWebviewProvider } from './webview/WebViewProvider';
+import {ProjectPath} from './ProjectPath';
 
 
-
-export const stringLocal = getLang();
+export let stringLocal : any;
+export let projectPath: ProjectPath;
+// export let isRefresh: boolean;
 
 
 export function activate(context: vscode.ExtensionContext) {
-
+	projectPath = ProjectPath.getInstance(context);
+	stringLocal = getLang();
+	
 	console.log('Congratulations, your extension "welcome-extension-plugin" is now active!');
 
 	//手动执行容器视图

@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import* as path from 'path';
 import * as fs from 'fs';
+import { ProjectPath } from './ProjectPath';
 export function getLang(): any{
     const lang = vscode.env.language;
     let fileName = 'package.nls.json';
@@ -9,7 +10,7 @@ export function getLang(): any{
     }
     
     // 获取扩展的根目录路径
-    const extensionPath = path.join(__dirname, '../');
+    const extensionPath = ProjectPath.getExtensionPath();
     const filePath = path.join(extensionPath, fileName);
     
     // 检查文件是否存在
