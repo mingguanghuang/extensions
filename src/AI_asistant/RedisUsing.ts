@@ -1,31 +1,24 @@
 import { RedisChatMessageHistory } from "@langchain/redis";
 import { createClient } from "redis";
-import { TONGYI_AIAssistant } from "./AI_asistant";
-import { BaseMessage } from "@langchain/core/messages";
+import { BaseMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
 
-export interface ChatHistoryConfig {
-  sessionId: string;
-  role: string;
-  content: string;
-}
-
-export class ChatHistory{
+export const REDIS_URL = "redis://127.0.0.1:6379";
+export class RedisUsing{
     private redisClient: any;
-    private history: RedisChatMessageHistory;
+    public history: RedisChatMessageHistory;
 
-    constructor(private session: ChatHistoryConfig) {
-        this.session = session;
+    constructor(private sessionId: string) {
+        this.sessionId = sessionId;
         
         // 初始化redis客户端
         this.redisClient = createClient({
-            url: process.env.REDIS_URL || "redis://localhost:6379"
+            url: REDIS_URL,
         });
         
         // 获取会话历史并添加到redis缓存
         this.history = new RedisChatMessageHistory({
-            sessionId: this.session.sessionId,
+            sessionId: this.sessionId,
             client: this.redisClient
-            // 移除了不存在的参数 numberOfGenerations
         });
     }
 
@@ -43,11 +36,20 @@ export class ChatHistory{
         }
     }
 
-    // 添加消息到历史记录
-    public async addMessage(message: BaseMessage): Promise<void> {
+    // 添加用户消息到历史记录
+    public async addUserMessage(content: string): Promise<void> {
         await this.connect();
+        const message = new HumanMessage(content);
         await this.history.addMessage(message);
     }
+
+    // 添加AI消息到历史记录
+    public async addAIMessage(content: string): Promise<void> {
+        await this.connect();
+        const message = new AIMessage(content);
+        await this.history.addMessage(message);
+    }
+
 
     // 获取历史消息
     public async getHistory(): Promise<BaseMessage[]> {
@@ -55,9 +57,15 @@ export class ChatHistory{
         return await this.history.getMessages();
     }
 
+
     // 清除历史记录
     public async clearHistory(): Promise<void> {
         await this.connect();
         await this.history.clear();
+    }
+
+    public async DeleteEarliestHistory(): Promise<void> {
+        await this.connect();
+       
     }
 }

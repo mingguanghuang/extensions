@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { getHtmlForWebview } from './webview';
-import { TongyiModel, ALI_TONGYI_Prompt_Messages, ALI_TONGYI_API_KEY, ALI_TONGYI_API_URL } from '../AI_asistant/model_config';
+import { TongyiModel, ALI_TONGYI_API_KEY, ALI_TONGYI_API_URL } from '../AI_asistant/model_config';
 import { TONGYI_AIAssistant } from '../AI_asistant/AI_asistant';
 import { ProjectPath } from '../ProjectPath';
 export class AI_asistant_WebViewProvider implements vscode.WebviewViewProvider {
@@ -168,17 +168,6 @@ export class TongYi_AI_assistant_Process {
         // 显示加载指示器
         this.sendLoading(true);
         try {
-            // 准备发送给AI的消息格式
-            const messages: ALI_TONGYI_Prompt_Messages[] = [
-                {
-                    role: 'system',
-                    content: '你是一个专业的编程助手，帮助用户解决编程问题和提供代码建议。'
-                },
-                {
-                    role: 'user',
-                    content: userMessage
-                }
-            ];
 
             // 调用AI模型
             // const response = await this._aiAssistant.ChatMethod(messages);
@@ -187,7 +176,7 @@ export class TongYi_AI_assistant_Process {
             // this.sendAIResponse(response);
 
             // 流式处理 - 实时接收响应
-            const stream = this._aiAssistant.ChatMethodStreamWithRAG(messages);
+            const stream = this._aiAssistant.ChatMethodStreamWithRAG(userMessage,"HMG");
             for await (const chunk of stream) {
                 // console.log('收到区块:', chunk);
                 this.sendStreamingResponse(chunk);

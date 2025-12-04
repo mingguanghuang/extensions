@@ -32,34 +32,7 @@ export interface ModelConfig {
     topP?: number;
 }
 
-//模型提示词，所有模型的提示词都应从该接口继承
-export interface modelPrompt{
-    role: "system" | "user" | "assistant" | "tool";
-    content: string;
-}
 
-//通义千问助手额外字段
-export interface ALI_AssistantExtras extends modelPrompt{
-    partial?: boolean;
-    tool_calls?: {
-        id: string;
-        type: string;
-        function: {
-            name: string;
-            arguments: string;
-        };
-    }[];
-}
-//通义千问工具额外字段
-export interface ALI_ToolExtras extends modelPrompt{
-    tool_call_id: string;
-
-}
-//通义千问模型提示消息类型
-export type ALI_TONGYI_Prompt_Messages = 
-  | (modelPrompt & { role: "assistant" } & ALI_AssistantExtras)
-  | (modelPrompt & { role: "tool" } & ALI_ToolExtras)
-  | (modelPrompt & { role: "system" | "user" });
 
 /**
  * 需要实现的模型类，所有模型类都需要从该类继承
@@ -87,5 +60,5 @@ export abstract class ModelBase implements ModelConfig{
     // 模型实例,在子类方法中实现
     public abstract chatModel: ChatOpenAI;
     // 模型消息发送，具体方法在子类中实现
-    public abstract ChatMethod(messages: ALI_TONGYI_Prompt_Messages[]): Promise<string>;
+    public abstract ChatMethod(userMessage: string): Promise<string>;
 }
