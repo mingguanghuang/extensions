@@ -18,7 +18,7 @@ export class RedisUsing{
         // 获取会话历史并添加到redis缓存
         this.history = new RedisChatMessageHistory({
             sessionId: this.sessionId,
-            client: this.redisClient
+            client: this.redisClient,
         });
     }
 

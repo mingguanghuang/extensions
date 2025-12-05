@@ -9,10 +9,10 @@
 
 
 node.js: => model_select = > query
-                              ||
+    ||
 python: => RAG => retriever_content
-                            ||
-node.js:                  prompt => chain => response
-                                                ||
-vue:                                           html_content                              
+    ||
+node.js: => prompt => chain => response
+    ||                                       
+vue: => html_content                              
 
