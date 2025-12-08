@@ -1,10 +1,10 @@
-import { ModelConfig, ALI_TONGYI_API_KEY, ModelBase } from './model_config';
+import { ModelConfig, ModelBase } from '../config/model_config';
+import { ALI_TONGYI_API_KEY } from '../config/env';
 import { ChatOpenAI, ChatOpenAICallOptions } from '@langchain/openai';
-import { BaseMessage, SystemMessage, HumanMessage, AIMessage, ToolMessage } from '@langchain/core/messages';
 import { StringOutputParser } from '@langchain/core/output_parsers';
-import { getRetrievalResults } from '../api/api';
+import { getRetrievalResults } from '../api/RagFolwApi';
 import { RunnableWithMessageHistory } from "@langchain/core/runnables";
-import { RedisUsing} from './RedisUsing';
+import { RedisUsing} from '../utils/RedisUsing';
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 
 

@@ -1,8 +1,11 @@
 import * as vscode from 'vscode';
 import { getHtmlForWebview } from './webview';
-import { TongyiModel, ALI_TONGYI_API_KEY, ALI_TONGYI_API_URL } from '../AI_asistant/model_config';
+import { TongyiModel, ALI_TONGYI_API_URL } from '../config/model_config';
 import { TONGYI_AIAssistant } from '../AI_asistant/AI_asistant';
 import { ProjectPath } from '../ProjectPath';
+import { UserManager } from '../api/UserApi';
+import { ALI_TONGYI_API_KEY } from '../config/env';
+
 export class AI_asistant_WebViewProvider implements vscode.WebviewViewProvider {
     private _webviewView?: vscode.WebviewView;
     private _aiAssistantProcess?: TongYi_AI_assistant_Process;
@@ -74,10 +77,15 @@ export class TongYi_AI_assistant_Process {
     private _currentModel: string = TongyiModel.get("ALI_TONGYI_MAX_MODEL")!;
     private _availableModels: Record<string, string> = {};
     private _modelId: string = "ALI_TONGYI_MAX_MODEL";
+    private _currentSessionId: string; // 添加当前会话ID属性
+    private _userManager: UserManager; // 添加 UserManager 实例
     constructor(webview: vscode.Webview) {
         this._webview = webview;
         this._availableModels = Object.fromEntries(TongyiModel);
+        this._currentSessionId = this.generateUniqueSessionId(); // 初始化会话ID
         this.initializeAIAssistant();
+        this._userManager = new UserManager(); // 初始化 UserManager
+        this._userManager.initMySqlDatabase();
     }
     public get AllAvailableModels() {
         return { ...this._availableModels };
@@ -130,8 +138,24 @@ export class TongYi_AI_assistant_Process {
                 //     this.handleClearHistory();
                 //     break;
 
+                case 'newSession': // 添加处理新会话的消息类型
+                    this.handleNewSession();
+                    break;
+
                 case 'configureApiKey':
                     await this.resetConfigureApiKey();
+                    break;
+
+                case 'requestVerificationCode':
+                    await this.handleRequestVerificationCode(message);
+                    break;
+
+                case 'register':
+                    await this.handleRegister(message);
+                    break;
+
+                case 'login':
+                    await this.handleLogin(message);
                     break;
 
                 default:
@@ -154,31 +178,12 @@ export class TongYi_AI_assistant_Process {
             return;
         }
 
-        // // 添加用户消息到历史记录
-        // this._chatHistory.push({
-        //     role: 'user',
-        //     content: userMessage,
-        //     timestamp: Date.now(),
-        //     model: this._currentModel
-        // });
-
-        // // 发送更新后的历史记录
-        // this.sendChatHistory();
-
         // 显示加载指示器
         this.sendLoading(true);
         try {
-
-            // 调用AI模型
-            // const response = await this._aiAssistant.ChatMethod(messages);
-
-            // 发送AI回复到前端
-            // this.sendAIResponse(response);
-
-            // 流式处理 - 实时接收响应
-            const stream = this._aiAssistant.ChatMethodStreamWithRAG(userMessage,"HMG");
+            // 流式处理 - 实时接收响应，使用固定的会话ID
+            const stream = this._aiAssistant.ChatMethodStreamWithRAG(userMessage, this._currentSessionId);
             for await (const chunk of stream) {
-                // console.log('收到区块:', chunk);
                 this.sendStreamingResponse(chunk);
             }
             this.sendSessionEnd();
@@ -283,17 +288,118 @@ export class TongYi_AI_assistant_Process {
             timestamp: Date.now()
         });
     }
+    // 发送会话结束消息，用于结束一次问题回答，不会重置会话ID
     private sendSessionEnd() {
-    this._webview.postMessage({
-        type: 'sessionEnd',
-        content: "------会话结束------",
-        model: this._currentModel,
-        timestamp: Date.now(),
-    });
-}
+        this._webview.postMessage({
+            type: 'sessionEnd',
+            content: "------会话结束------",
+            model: this._currentModel,
+            timestamp: Date.now(),
+        });
+    }
+
+    // 添加生成唯一会话ID的方法
+    private generateUniqueSessionId(): string {
+        const timestamp = Date.now();
+        const userName = this._userManager.getCurrentUserInfo().then(userInfo => userInfo.name);
+        return `session_${userName}_${timestamp}`;
+    }
+
+    // 添加重置会话ID的方法，用于创建新对话
+    public resetSessionId(): void {
+        this._currentSessionId = this.generateUniqueSessionId();
+    }
+
+    // 添加处理新会话的方法
+    private handleNewSession() {
+        this.resetSessionId();
+        // 可以发送一个确认消息给前端表示会话已重置
+        this._webview.postMessage({
+            type: 'sessionReset',
+            message: '新会话已创建'
+        });
+    }
+
     private sendInitialData() {
         this.sendAvailableModels();
         this.sendCurrentModel();
         // this.sendChatHistory();
     }
+
+    private async handleRequestVerificationCode(message: any) {
+        try {
+            const { email } = message;
+            await this._userManager.getVerificationCode(email);
+
+            // 发送成功消息到前端
+            this._webview.postMessage({
+                type: 'verificationCodeSent',
+                message: '验证码已发送到您的邮箱'
+            });
+        } catch (error) {
+            console.error('获取验证码失败:', error);
+            this.sendError('获取验证码失败: ' + (error as Error).message);
+        }
+    }
+
+    private async handleRegister(message: any) {
+        try {
+            const { email, password, verificationCode } = message;
+            const result = await this._userManager.register(email, password, verificationCode);
+
+            // 发送注册成功消息到前端
+            this._webview.postMessage({
+                type: 'registrationSuccess',
+                token: result.token,
+                userId: result.userId,
+                message: '注册成功'
+            });
+        } catch (error) {
+            console.error('注册失败:', error);
+            this.sendError('注册失败: ' + (error as Error).message);
+        }
+    }
+
+    private async handleLogin(message: any) {
+        try {
+            const { email, password } = message;
+            const result = await this._userManager.login(email, password);
+
+            // 发送登录成功消息到前端
+            this._webview.postMessage({
+                type: 'loginSuccess',
+                token: result.token,
+                userId: result.userId,
+                message: '登录成功'
+            });
+        } catch (error) {
+            console.error('登录失败:', error);
+            this.sendError('登录失败: ' + (error as Error).message);
+        }
+    }
+
+    // 添加登出处理方法
+    private async handleLogout() {
+        this._userManager.clearToken();
+        // 通知前端登出成功
+        this._webview.postMessage({
+            type: 'logoutSuccess',
+            message: '已成功登出'
+        });
+    }
+    // 添加检查认证状态的方法
+    private async checkAuthStatus() {
+        try {
+            const isValid = await this._userManager.verifyToken();
+            this._webview.postMessage({
+                type: 'authStatus',
+                isAuthenticated: isValid,
+                message: isValid ? '用户已认证' : '用户未认证'
+            });
+        } catch (error) {
+            this._userManager.clearToken();
+            this.sendError('认证检查失败: ' + (error as Error).message);
+        }
+    }
+
 }

@@ -1,70 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="">
   <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="./favicon.ico">
+    <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NiuNiu Extension - 项目创建工具</title>
-    
-    <!-- 基础样式，确保在CSS加载前页面有基本样式 -->
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background-color: #1e1e1e;
-        color: #cccccc;
-      }
-      
-      #app {
-        min-height: 100vh;
-      }
-      
-      /* 加载指示器 */
-      .loading-indicator {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        font-size: 16px;
-        color: #cccccc;
-      }
-      
-      /* 隐藏加载指示器 */
-      .loading-indicator.hidden {
-        display: none;
-      }
-    </style>
-    <script type="module" crossorigin src="./assets/index.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index.css">
+    <title>Vite App</title>
+    <script type="module" crossorigin src="/assets/index.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index.css">
   </head>
   <body>
-    <!-- 加载指示器，在Vue应用加载完成前显示 -->
-    <div id="loading" class="loading-indicator">
-      加载中...
-    </div>
-    
     <div id="app"></div>
-    
-    
-    <!-- 添加Vue应用挂载后的加载指示器隐藏逻辑 -->
-    <script>
-      // 监听Vue应用挂载完成事件
-      window.addEventListener('vue-mounted', function() {
-        const loadingElement = document.getElementById('loading');
-        if (loadingElement) {
-          loadingElement.classList.add('hidden');
-        }
-      });
-      
-      // 如果Vue应用挂载失败，也隐藏加载指示器
-      setTimeout(function() {
-        const loadingElement = document.getElementById('loading');
-        const appElement = document.getElementById('app');
-        if (loadingElement && appElement && appElement.children.length > 0) {
-          loadingElement.classList.add('hidden');
-        }
-      }, 5000); // 5秒后检查
-    </script>
   </body>
 </html>

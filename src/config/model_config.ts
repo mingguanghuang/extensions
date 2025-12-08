@@ -1,16 +1,6 @@
 // 通义千问API相关常量
-import * as vscode from 'vscode';
-import dotenv from 'dotenv';
-import { ChatOpenAI } from '@langchain/openai';
-import path from 'path';
 
-//加载环境变量
-const envPath = path.join(__dirname, '../.env');
-dotenv.config({ path: envPath });
-export const ALI_TONGYI_API_KEY = process.env.DASHSCOPE_API_KEY || "";
-export const apiKey = process.env.RAGFLOW_API_KEY || "";
-export const COMMPANY_SET = process.env.COMMPANY_SET || "";
-export const COMPANY_SET_DOC = process.env.COMPANY_SET_DOC || "";
+import { ChatOpenAI } from '@langchain/openai';
 
 export const ALI_TONGYI_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1";
 // 通义千问模型映射

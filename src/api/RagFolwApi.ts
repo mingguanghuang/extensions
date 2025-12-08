@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { COMMPANY_SET, COMPANY_SET_DOC, apiKey } from '../AI_asistant/model_config';
+import { COMMPANY_SET, COMPANY_SET_DOC, apiKey } from '../config/env';
 /**
- * 该文件主要实现http请求信息的封装，后续会嵌入vue框架来实现前端页面，前端页面会调用该文件的方法来实现与后端的交互
+ * 该文件主要实现http请求信息的封装
  */
 
 const RAGFlowUrl = 'http://localhost:80';
@@ -107,3 +107,4 @@ export async function getRetrievalResults(question: string): Promise<Chunk[]> {
         throw error;
     }
 }
+
