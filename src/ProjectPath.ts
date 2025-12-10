@@ -10,7 +10,7 @@ export class ProjectPath {
     static readonly ProjectType = "ProjectType"
     static readonly Welcome = "Welcome"
 
-    private static context: vscode.ExtensionContext;
+    static context: vscode.ExtensionContext;
      private constructor(context: vscode.ExtensionContext) {
         ProjectPath.context = context;
     }

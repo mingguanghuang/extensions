@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { COMMPANY_SET, COMPANY_SET_DOC, apiKey } from '../config/env';
+import { COMPANY_SET, COMPANY_SET_DOC, apiKey } from '../config/env';
 /**
  * 该文件主要实现http请求信息的封装
  */
@@ -80,7 +80,7 @@ export async function getRetrievalResults(question: string): Promise<Chunk[]> {
     try {
         const requestBody: enableRetrievalRequest = {
             question: question,
-            dataset_ids: [COMMPANY_SET],
+            dataset_ids: [COMPANY_SET],
             document_ids: [COMPANY_SET_DOC],
             page: 1,
             page_size: 10,

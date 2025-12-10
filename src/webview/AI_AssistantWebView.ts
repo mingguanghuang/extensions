@@ -3,7 +3,7 @@ import { getHtmlForWebview } from './webview';
 import { TongyiModel, ALI_TONGYI_API_URL } from '../config/model_config';
 import { TONGYI_AIAssistant } from '../AI_asistant/AI_asistant';
 import { ProjectPath } from '../ProjectPath';
-import { UserManager } from '../api/UserApi';
+import { UserManager } from '../api/UserLogin';
 import { ALI_TONGYI_API_KEY } from '../config/env';
 
 export class AI_asistant_WebViewProvider implements vscode.WebviewViewProvider {
@@ -301,8 +301,8 @@ export class TongYi_AI_assistant_Process {
     // 添加生成唯一会话ID的方法
     private generateUniqueSessionId(): string {
         const timestamp = Date.now();
-        const userName = this._userManager.getCurrentUserInfo().then(userInfo => userInfo.name);
-        return `session_${userName}_${timestamp}`;
+        // const userName = this._userManager.getCurrentUserInfo().then(userInfo => userInfo.name);
+        return `session_user_${timestamp}`;
     }
 
     // 添加重置会话ID的方法，用于创建新对话
